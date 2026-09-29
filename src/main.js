@@ -2,6 +2,8 @@ import './style.css';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
+import { createI18n } from './i18n.js';
+import { dict } from './lang.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -9,6 +11,10 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+/* ---------------- Language ---------------- */
+const i18n = createI18n({ dict });
+const { t } = i18n;
 
 /* ---------------- Smooth scroll ---------------- */
 const lenis = new Lenis({ duration: 1.15, smoothWheel: !reduceMotion });
@@ -105,7 +111,7 @@ const menu = $('#menu');
 function openMenu() {
   document.body.classList.add('menu-open');
   burger.setAttribute('aria-expanded', 'true');
-  burger.setAttribute('aria-label', 'Close menu');
+  burger.setAttribute('aria-label', t('menu.close'));
   menu.setAttribute('aria-hidden', 'false');
   header.classList.remove('is-hidden');
   lenis.stop();
@@ -115,7 +121,7 @@ function closeMenu() {
   if (!document.body.classList.contains('menu-open')) return;
   document.body.classList.remove('menu-open');
   burger.setAttribute('aria-expanded', 'false');
-  burger.setAttribute('aria-label', 'Open menu');
+  burger.setAttribute('aria-label', t('menu.open'));
   menu.setAttribute('aria-hidden', 'true');
   lenis.start();
 }
@@ -145,7 +151,7 @@ if (finePointer) {
     const link = e.target.closest('a, button');
     cursor.classList.toggle('is-view', !!view);
     cursor.classList.toggle('is-link', !view && !!link);
-    if (view) label.textContent = view.dataset.cursor;
+    if (view) label.textContent = t(`cursor.${view.dataset.cursor}`);
   });
 }
 
@@ -187,15 +193,25 @@ if (!reduceMotion) {
 }
 
 /* ---------------- Word-by-word reveal ---------------- */
-$$('.reveal-words').forEach((el) => {
-  const words = el.textContent.trim().split(/\s+/);
-  el.innerHTML = words.map((w) => `<span class="word">${w}</span>`).join(' ');
-  gsap.to(el.querySelectorAll('.word'), {
-    opacity: 1,
-    stagger: 0.1,
-    ease: 'none',
-    scrollTrigger: { trigger: el, start: 'top 80%', end: 'bottom 45%', scrub: true },
+let revealTweens = [];
+function setupReveal() {
+  revealTweens.forEach((tw) => (tw.scrollTrigger?.kill(), tw.kill()));
+  revealTweens = $$('.reveal-words').map((el) => {
+    const words = el.textContent.trim().split(/\s+/);
+    el.innerHTML = words.map((w) => `<span class="word">${w}</span>`).join(' ');
+    return gsap.to(el.querySelectorAll('.word'), {
+      opacity: 1,
+      stagger: 0.1,
+      ease: 'none',
+      scrollTrigger: { trigger: el, start: 'top 80%', end: 'bottom 45%', scrub: true },
+    });
   });
+}
+setupReveal();
+
+i18n.onChange(() => {
+  setupReveal();
+  ScrollTrigger.refresh();
 });
 
 /* ---------------- Counters ---------------- */

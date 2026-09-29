@@ -6,7 +6,7 @@
   --line: rgba(242, 239, 233, 0.14);
   --accent: #d7ff3d;
   --accent-ink: #0c0c0d;
-  --font-display: 'Syne', system-ui, sans-serif;
+  --font-display: 'Syne', 'Unbounded', system-ui, sans-serif;
   --font-body: 'Manrope', system-ui, sans-serif;
   --pad: clamp(16px, 4vw, 56px);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -1253,6 +1253,89 @@ ul {
   -webkit-text-stroke: 1px rgba(242, 239, 233, 0.18);
   user-select: none;
   transform: translateY(8%);
+}
+
+/* ---------- Language switch ---------- */
+.lang {
+  display: flex;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.lang button {
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 999px;
+  opacity: 0.45;
+  transition: opacity 0.3s, background 0.3s, color 0.3s;
+}
+
+.lang button:hover {
+  opacity: 1;
+}
+
+.lang button.is-active {
+  opacity: 1;
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.menu-open .lang button.is-active {
+  background: var(--accent-ink);
+  color: var(--accent);
+}
+
+.menu__link b {
+  font-weight: inherit;
+}
+
+/* Russian copy (Unbounded) is wider — rebalance the large type */
+html[lang='ru'] .hero__title {
+  font-size: clamp(29px, min(6.7vw, 11.5vh), 120px);
+  letter-spacing: -0.03em;
+}
+html[lang='ru'] .section-title {
+  font-size: clamp(30px, 5.4vw, 84px);
+}
+/* room for Ё / Й marks that sit above cap height inside the clipped lines */
+html[lang='ru'] .line {
+  padding-top: 0.14em;
+  margin-top: -0.14em;
+}
+html[lang='ru'] .intro__text {
+  font-size: clamp(21px, 3.4vw, 52px);
+}
+html[lang='ru'] .marquee__group span {
+  font-size: clamp(24px, 4.6vw, 68px);
+}
+html[lang='ru'] .service__title {
+  font-size: clamp(20px, 3.1vw, 46px);
+}
+html[lang='ru'] .step h3 {
+  font-size: clamp(22px, 2.5vw, 38px);
+}
+html[lang='ru'] .card--more {
+  font-size: clamp(20px, 2.4vw, 38px);
+}
+html[lang='ru'] .quote p {
+  font-size: clamp(20px, 2.9vw, 42px);
+}
+html[lang='ru'] .menu__link {
+  font-size: clamp(32px, 9vw, 64px);
+}
+html[lang='ru'] .footer__big {
+  font-size: clamp(48px, 11vw, 180px);
+}
+html[lang='ru'] .footer__title > span {
+  font-size: clamp(22px, 3.2vw, 44px);
+}
+
+@media (min-width: 861px) {
+  html[lang='ru'] .work__head .section-title {
+    font-size: min(4.6vw, 8vh);
+  }
 }
 
 /* ---------- Responsive ---------- */

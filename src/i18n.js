@@ -1,0 +1,85 @@
+/**
+ * Tiny i18n helper.
+ * English lives in the HTML itself (it is read from the DOM on start),
+ * other languages come from a dictionary. Elements opt in with:
+ *   data-i18n="key"                 → innerHTML
+ *   data-i18n-attr="attr:key;..."   → attributes (placeholder, aria-label…)
+ */
+const STORAGE_KEY = 'lang';
+const SUPPORTED = ['ru', 'en'];
+
+export function createI18n({ dict, fallback = 'en', defaultLang = 'ru' }) {
+  const base = {};
+  const textNodes = [...document.querySelectorAll('[data-i18n]')];
+  const attrNodes = [...document.querySelectorAll('[data-i18n-attr]')];
+
+  textNodes.forEach((el) => (base[el.dataset.i18n] = el.innerHTML.trim()));
+  attrNodes.forEach((el) =>
+    el.dataset.i18nAttr.split(';').forEach((pair) => {
+      const [attr, key] = pair.split(':');
+      base[key] = el.getAttribute(attr);
+    })
+  );
+  base['meta.title'] = document.title;
+  base['meta.desc'] = document.querySelector('meta[name="description"]')?.content ?? '';
+
+  const dicts = { ...dict, [fallback]: { ...base, ...(dict[fallback] || {}) } };
+  const listeners = new Set();
+
+  let lang = defaultLang;
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (SUPPORTED.includes(saved)) lang = saved;
+  } catch {
+    /* storage blocked — use default */
+  }
+
+  const t = (key, vars = {}) => {
+    const str = dicts[lang]?.[key] ?? dicts[fallback]?.[key] ?? key;
+    return str.replace(/\{(\w+)\}/g, (_, v) => vars[v] ?? '');
+  };
+
+  function apply() {
+    document.documentElement.lang = lang;
+    textNodes.forEach((el) => (el.innerHTML = t(el.dataset.i18n)));
+    attrNodes.forEach((el) =>
+      el.dataset.i18nAttr.split(';').forEach((pair) => {
+        const [attr, key] = pair.split(':');
+        el.setAttribute(attr, t(key));
+      })
+    );
+    document.title = t('meta.title');
+    document.querySelector('meta[name="description"]')?.setAttribute('content', t('meta.desc'));
+    document.querySelectorAll('[data-lang-btn]').forEach((b) => {
+      const active = b.dataset.langBtn === lang;
+      b.classList.toggle('is-active', active);
+      b.setAttribute('aria-pressed', String(active));
+    });
+  }
+
+  function set(next) {
+    if (!SUPPORTED.includes(next) || next === lang) return;
+    lang = next;
+    try {
+      localStorage.setItem(STORAGE_KEY, lang);
+    } catch {
+      /* ignore */
+    }
+    apply();
+    listeners.forEach((fn) => fn(lang));
+  }
+
+  document.querySelectorAll('[data-lang-btn]').forEach((b) => b.addEventListener('click', () => set(b.dataset.langBtn)));
+
+  apply();
+
+  return {
+    t,
+    set,
+    get lang() {
+      return lang;
+    },
+    locale: () => (lang === 'ru' ? 'ru-RU' : 'en-US'),
+    onChange: (fn) => listeners.add(fn),
+  };
+}

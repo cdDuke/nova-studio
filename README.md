@@ -1,6 +1,7 @@
 # Nova Studio — сайт креативного агентства
 
 Концепт-сайт вымышленной digital-студии с акцентом на анимации и интерактив.
+**Двуязычный: русский (по умолчанию) и английский** — переключатель RU / EN в шапке.
 
 **Стек:** Vite · Vanilla JS · GSAP (ScrollTrigger) · Lenis (плавный скролл) · CSS без фреймворков
 
@@ -16,6 +17,7 @@
 - Карточки этапов работы, складывающиеся в стопку (sticky)
 - Слайдер отзывов с автопрокруткой и свайпом
 - Полноэкранное мобильное меню, скрытие шапки при скролле вниз
+- Локализация RU/EN без перезагрузки: тексты, мета-теги, подписи курсора; для кириллицы подключён Unbounded (у Syne нет кириллицы), размеры типографики подстроены под длину русских слов
 
 ## Адаптивность и доступность
 
@@ -34,4 +36,4 @@ npm run build    # сборка в dist/
 
 ---
 
-*Concept website built as a portfolio piece. All brands and people are fictional.*
+*Concept website built as a portfolio piece. All brands and people are fictional. Bilingual: Russian / English.*
