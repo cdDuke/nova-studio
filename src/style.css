@@ -1468,3 +1468,14 @@ html[lang='ru'] .footer__title > span {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Unbounded (Cyrillic) has overlapping contours, so -webkit-text-stroke draws
+   lines inside the letters. Build the outline from text-shadows instead —
+   shadows follow the merged glyph shape. */
+html[lang='ru'] .hero__title em {
+  -webkit-text-stroke: 0;
+  color: var(--bg);
+  text-shadow:
+    1.5px 0 0 var(--fg), -1.5px 0 0 var(--fg), 0 1.5px 0 var(--fg), 0 -1.5px 0 var(--fg),
+    1.1px 1.1px 0 var(--fg), -1.1px 1.1px 0 var(--fg), 1.1px -1.1px 0 var(--fg), -1.1px -1.1px 0 var(--fg);
+}
